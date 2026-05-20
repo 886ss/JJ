@@ -27,8 +27,9 @@ Thumbs.db
 *.log
 .pytest_cache/
 
-# MLflow
+# MLflow / 训练结果
 mlruns/
+results/
 
 # Data >50MB
 *.zip
