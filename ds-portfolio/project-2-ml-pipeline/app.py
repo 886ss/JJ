@@ -233,19 +233,38 @@ tab1, tab2 = st.tabs(["模型性能", "批量测试"])
 with tab1:
     col1, col2, col3 = st.columns(3)
 
-    # Try loading results
-    results_path = "results/evaluation_results.json"
-    if os.path.exists(results_path):
+    # Try loading results:优先 training_results.json，其次 evaluation_results.json
+    results_path = None
+    for cand in ["results/training_results.json", "results/evaluation_results.json"]:
+        if os.path.exists(cand):
+            results_path = cand
+            break
+
+    if results_path:
         with open(results_path, encoding="utf-8") as f:
             results = json.load(f)
-        overall = results.get("overall", {})
+
+        # 适配两种文件结构
+        if "test" in results:
+            test = results["test"]
+            overall = {"accuracy": test.get("accuracy", 0),
+                       "f1_weighted": test.get("f1_weighted", 0),
+                       "num_samples": sum(v.get("support", 0) for v in test.get("per_class", {}).values())}
+            per_class = test.get("per_class", {})
+            cv_info = results.get("cv_scores", {})
+        else:
+            overall = results.get("overall", {})
+            per_class = results.get("per_class", {})
+            cv_info = {}
+
         col1.metric("准确率", f"{overall.get('accuracy', 0):.1%}")
         col2.metric("F1 分数", f"{overall.get('f1_weighted', 0):.1%}")
         col3.metric("样本数", overall.get("num_samples", 0))
+        if cv_info:
+            st.caption(f"5-Fold CV F1: {cv_info.get('mean', 0):.4f} (±{cv_info.get('std', 0):.4f})")
 
-        st.subheader("各类别 F1 分数")
-        per_class = results.get("per_class", {})
         if per_class:
+            st.subheader("各类别 F1 分数")
             df_f1 = pd.DataFrame([
                 {"类别": k, "F1分数": v["f1"], "精确率": v["precision"], "召回率": v["recall"]}
                 for k, v in per_class.items()
@@ -254,12 +273,8 @@ with tab1:
                         barmode="group", height=350,
                         color_discrete_sequence=["#636EFA", "#00CC96", "#EF553B"])
             st.plotly_chart(fig, use_container_width=True)
-
-    # Confusion matrix
-    cm_path = "results/confusion_matrix.png"
-    if os.path.exists(cm_path):
-        st.subheader("混淆矩阵")
-        st.image(cm_path)
+    else:
+        st.info("尚未训练模型，运行 `python train.py` 后此处将显示性能指标")
 
 with tab2:
     st.subheader("批量测试")
