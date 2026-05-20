@@ -12,11 +12,17 @@ import pandas as pd
 import mlflow
 import mlflow.sklearn
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score
 import joblib
+
+try:
+    from xgboost import XGBClassifier
+    HAS_XGBOOST = True
+except ImportError:
+    HAS_XGBOOST = False
 
 import config
 from data import load_20newsgroups, preprocess_texts, clean_text
@@ -31,15 +37,22 @@ def get_model(model_name: str):
             C=1.0, max_iter=2000, random_state=config.RANDOM_SEED,
             multi_class="multinomial", n_jobs=-1,
         ),
-        "svm": LinearSVC(
-            C=1.0, max_iter=2000, random_state=config.RANDOM_SEED,
-            dual=False,
+        "svm": SVC(
+            kernel="linear", C=1.0, max_iter=2000,
+            random_state=config.RANDOM_SEED, probability=True,
         ),
         "rf": RandomForestClassifier(
             n_estimators=200, max_depth=50, min_samples_split=5,
             random_state=config.RANDOM_SEED, n_jobs=-1,
         ),
+        "xgb": XGBClassifier(
+            n_estimators=200, max_depth=6, learning_rate=0.1,
+            random_state=config.RANDOM_SEED, n_jobs=-1,
+            eval_metric="mlogloss",
+        ) if HAS_XGBOOST else None,
     }
+    if model_name == "xgb" and not HAS_XGBOOST:
+        raise ImportError("xgboost not installed. Run: pip install xgboost")
     return models.get(model_name, models["logistic"])
 
 
@@ -162,7 +175,7 @@ def train(model_name: str, tune_params: dict = None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="训练新闻分类模型")
     parser.add_argument("--model", type=str, default=config.DEFAULT_MODEL,
-                        choices=["logistic", "svm", "rf"],
+                        choices=["logistic", "svm", "rf", "xgb"],
                         help="模型类型")
     parser.add_argument("--C", type=float, default=1.0,
                         help="正则化强度（logistic/svm）")

@@ -98,4 +98,4 @@ project-3-recommender/
 
 ## 简历亮点
 
-> 基于 implicit 实现协同过滤推荐引擎；在 MovieLens 100k 数据集上对比 ALS / BPR / LMF 三种算法，最优 Precision@10 达 0.38；构建 FastAPI 推荐服务，支持实时个性化推荐与新用户冷启动兜底。
+> 基于 implicit 实现协同过滤推荐引擎；在 MovieLens 100k 数据集上对比 ALS / BPR / LMF 三种算法，最优 Precision@10 达 0.16, AUC 0.79；构建 FastAPI 推荐服务，支持实时个性化推荐与新用户冷启动兜底。

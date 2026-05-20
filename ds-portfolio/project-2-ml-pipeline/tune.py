@@ -47,12 +47,18 @@ def tune(model_name: str = "logistic", n_jobs: int = -1):
         },
         "svm": {
             "C": [0.1, 0.5, 1.0, 5.0, 10.0],
-            "loss": ["squared_hinge"],
+            "kernel": ["linear", "rbf"],
+            "gamma": ["scale", "auto"],
         },
         "rf": {
             "n_estimators": [100, 200, 500],
             "max_depth": [20, 50, None],
             "min_samples_split": [2, 5, 10],
+        },
+        "xgb": {
+            "n_estimators": [100, 200],
+            "max_depth": [3, 6, 9],
+            "learning_rate": [0.05, 0.1, 0.2],
         },
     }
 
@@ -105,7 +111,7 @@ def tune(model_name: str = "logistic", n_jobs: int = -1):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="超参数调优")
     parser.add_argument("--model", type=str, default="logistic",
-                        choices=["logistic", "svm", "rf"])
+                        choices=["logistic", "svm", "rf", "xgb"])
     parser.add_argument("--n_jobs", type=int, default=-1)
     args = parser.parse_args()
 

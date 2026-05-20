@@ -55,8 +55,7 @@ MAX_FEATURES = 5000
 NGRAM_RANGE = (1, 2)
 
 # ---------- MLflow ----------
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI",
-                                f"sqlite:///{MODEL_DIR}/mlflow.db")
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "./mlruns")
 MLFLOW_EXPERIMENT = "news-classification"
 
 # ---------- 训练 ----------

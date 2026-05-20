@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import os
+from sklearn.metrics.pairwise import cosine_similarity
 from data_loader import load_movielens_100k, load_latest_movies, get_hot_movies, get_recent_movies
 
 st.set_page_config(
@@ -126,6 +127,33 @@ def search_movies(query, limit=15):
         "year": int(r["year"]) if not pd.isna(r["year"]) else None,
         "genres": ", ".join(GENRE_CN.get(g, g) for g in r["genres"][:3]) if r["genres"] else "",
     } for _, r in results.iterrows()]
+
+def get_content_similar_items(item_id, n=10):
+    """基于电影类型找到相似电影。"""
+    if data.get("item_features") is None:
+        return []
+    item_feat = data["item_features"].toarray()
+    item_idx = item_id - 1
+    if item_idx < 0 or item_idx >= item_feat.shape[0]:
+        return []
+    sims = cosine_similarity(item_feat[item_idx:item_idx+1], item_feat)[0]
+    top = np.argsort(-sims)[1:n+1]
+    result = []
+    for i in top:
+        if sims[i] <= 0:
+            continue
+        movie = movies_df[movies_df["item_id"] == int(i) + 1]
+        if not movie.empty:
+            row = movie.iloc[0]
+            result.append({
+                "item_id": int(i) + 1,
+                "title": row["clean_title"],
+                "year": int(row["year"]) if not pd.isna(row.get("year")) else None,
+                "genres": ", ".join(GENRE_CN.get(g, g) for g in row["genres"][:3]) if row["genres"] else "",
+                "similarity": round(float(sims[i]), 4),
+            })
+    return result
+
 
 def get_user_top_rated(user_id, n=10):
     user_ratings = ratings_df[ratings_df["user_id"] == user_id].nlargest(n, "rating")

@@ -85,7 +85,7 @@ uvicorn serve:app --reload --port 8001  # 启动 API
 > *技术栈：Python + Pandas + scikit-learn + implicit + Streamlit + FastAPI + MLflow + Plotly*  
 > - 构建电商数据分析 Dashboard，清洗 12,000+ 条订单数据，集成销售趋势、RFM 客户分层等 8 个交互式组件  
 > - 实现端到端文本分类 Pipeline，涵盖 TF-IDF 特征工程、多模型对比、MLflow 实验追踪、FastAPI 模型部署  
-> - 开发混合推荐引擎，融合协同过滤与电影内容特征，Precision@10 达 0.38，对比 WARP/BPR/Logistic 三种损失函数
+> - 开发协同过滤推荐引擎，基于 implicit 实现 ALS/BPR/LMF 三种算法，Precision@10 达 0.16, AUC 0.79，构建 FastAPI 推荐服务
 
 ## 面试准备清单
 
