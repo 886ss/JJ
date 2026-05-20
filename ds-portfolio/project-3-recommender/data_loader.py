@@ -215,6 +215,60 @@ def build_implicit_feedback(data: dict, threshold: float = 4.0) -> csr_matrix:
     return interactions
 
 
+def _generate_latest_movies(n_movies=300, seed=42) -> pd.DataFrame:
+    """生成演示用最新热门电影数据。网络下载失败时兜底。"""
+    rng = np.random.default_rng(seed)
+    recent_titles = [
+        "Oppenheimer", "Barbie", "The Super Mario Bros. Movie", "Spider-Man: Across the Spider-Verse",
+        "Guardians of the Galaxy Vol. 3", "John Wick: Chapter 4", "Mission: Impossible - Dead Reckoning",
+        "The Flash", "Indiana Jones and the Dial of Destiny", "Transformers: Rise of the Beasts",
+        "Fast X", "The Little Mermaid", "Elemental", "Ant-Man and the Wasp: Quantumania",
+        "Creed III", "Scream VI", "Dungeons & Dragons: Honor Among Thieves", "Shazam! Fury of the Gods",
+        "The Equalizer 3", "Blue Beetle", "Gran Turismo", "The Nun II", "A Haunting in Venice",
+        "The Creator", "Killers of the Flower Moon", "Napoleon", "Wish", "Aquaman and the Lost Kingdom",
+        "The Marvels", "The Hunger Games: The Ballad of Songbirds and Snakes", "Five Nights at Freddy's",
+        "Trolls Band Together", "Migration", "Wonka", "The Color Purple", "Anyone But You",
+        "Mean Girls", "The Beekeeper", "Argylle", "Madame Web", "Bob Marley: One Love",
+        "Dune: Part Two", "Kung Fu Panda 4", "Ghostbusters: Frozen Empire", "Godzilla x Kong: The New Empire",
+        "Civil War", "The Fall Guy", "Kingdom of the Planet of the Apes", "Furiosa: A Mad Max Saga",
+        "Bad Boys: Ride or Die", "Inside Out 2", "A Quiet Place: Day One", "Despicable Me 4",
+        "Twisters", "Deadpool & Wolverine", "Borderlands", "Alien: Romulus", "Beetlejuice Beetlejuice",
+        "Joker: Folie à Deux", "Venom 3", "Gladiator 2", "Wicked", "Moana 2",
+        "The Lord of the Rings: The War of the Rohirrim", "Mufasa: The Lion King", "Sonic the Hedgehog 3",
+        "Nosferatu", "Avatar 3", "Thunderbolts", "The Fantastic Four", "Blade", "Avengers: Secret Wars",
+        "Everything Everywhere All at Once", "Top Gun: Maverick", "The Batman", "Doctor Strange in the Multiverse of Madness",
+        "Thor: Love and Thunder", "Black Panther: Wakanda Forever", "Avatar: The Way of Water",
+        "Puss in Boots: The Last Wish", "The Whale", "The Fabelmans", "Tár", "Triangle of Sadness",
+        "Women Talking", "Living", "Aftersun", "The Banshees of Inisherin", "All Quiet on the Western Front",
+        "Glass Onion: A Knives Out Mystery", "Black Adam", "Elvis", "Nope", "Minions: The Rise of Gru",
+        "Jurassic World Dominion", "Lightyear", "Bullet Train", "Smile", "M3GAN", "Cocaine Bear",
+        "Renfield", "Talk to Me", "Evil Dead Rise", "Saw X", "The Exorcist: Believer",
+    ] * 3
+    genre_pool = ["动作", "冒险", "动画", "喜剧", "犯罪", "剧情", "奇幻", "恐怖", "爱情", "科幻", "惊悚"]
+
+    movies = []
+    for i, title in enumerate(recent_titles[:n_movies]):
+        year = int(rng.integers(2015, 2026))
+        n_genres = rng.integers(1, 4)
+        genres = list(rng.choice(genre_pool, n_genres, replace=False))
+        rating_count = int(rng.integers(30, 5000))
+        rating_mean = round(float(rng.uniform(2.5, 4.5)), 1)
+        movies.append({
+            "movieId": i + 10000,
+            "title": f"{title} ({year})",
+            "clean_title": title,
+            "year": year,
+            "genres": "|".join(genres),
+            "genres_cn": genres,
+            "rating_count": rating_count,
+            "rating_mean": rating_mean,
+        })
+
+    df = pd.DataFrame(movies)
+    print(f"[数据] 演示最新电影数据已生成: {len(df)} 部 (2015-2025)")
+    return df
+
+
 def load_latest_movies() -> pd.DataFrame:
     """
     下载并加载 MovieLens 最新版数据集 (ml-latest, ~250MB)，
@@ -248,7 +302,8 @@ def load_latest_movies() -> pd.DataFrame:
             continue
 
     if latest_dir is None:
-        raise RuntimeError("所有 MovieLens 下载源均不可用（网络受限），跳过最新电影数据")
+        print("[提示] 所有 MovieLens 下载源均不可用，使用本地演示数据")
+        return _generate_latest_movies()
 
     movies_path = os.path.join(latest_dir, "movies.csv")
     ratings_path = os.path.join(latest_dir, "ratings.csv")

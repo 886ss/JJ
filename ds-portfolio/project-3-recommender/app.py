@@ -43,11 +43,8 @@ n_items = data["n_items"]
 
 @st.cache_data(ttl=3600)
 def _load_latest():
-    """延迟加载最新电影数据集。网络不可用时返回 None 并缓存结果，避免重复请求。"""
-    try:
-        return load_latest_movies()
-    except Exception:
-        return None
+    """延迟加载最新电影数据集。网络不可用时自动回退本地演示数据。"""
+    return load_latest_movies()
 
 
 @st.cache_data(ttl=1800)
