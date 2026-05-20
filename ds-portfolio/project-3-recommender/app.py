@@ -32,34 +32,40 @@ def load_data_and_model():
     bundle = joblib.load(os.path.join(model_dir, candidates[0]))
     return data, bundle["model"], bundle["config"]
 
-@st.cache_data(ttl=3600)
-def load_cached_latest_movies():
-    """缓存最新电影数据集，避免每次交互重载 86K 电影 CSV"""
-    return load_latest_movies()
-
-
 with st.spinner("加载电影数据与推荐模型中…"):
     data, model, model_config = load_data_and_model()
-    with st.spinner("加载最新电影数据集…"):
-        try:
-            latest_movies = load_cached_latest_movies()
-        except Exception as e:
-            latest_movies = None
-            st.warning(f"最新电影加载失败: {e}")
 
 movies_df = data["movies"]
 ratings_df = data["ratings"]
 n_users = data["n_users"]
 n_items = data["n_items"]
 
-# 预计算热门榜单（缓存，避免每次切 tab 重算）
+
+@st.cache_data(ttl=3600)
+def _load_latest():
+    """延迟加载最新电影数据集。网络不可用时返回 None 并缓存结果，避免重复请求。"""
+    try:
+        return load_latest_movies()
+    except Exception:
+        return None
+
+
 @st.cache_data(ttl=1800)
 def get_cached_hot_movies():
-    return get_hot_movies(latest_movies, min_ratings=80, top_n=15) if latest_movies is not None else []
+    try:
+        lm = _load_latest()
+    except Exception:
+        return []
+    return get_hot_movies(lm, min_ratings=80, top_n=15) if lm is not None else []
+
 
 @st.cache_data(ttl=1800)
 def get_cached_recent_movies():
-    return get_recent_movies(latest_movies, min_ratings=50, top_n=15) if latest_movies is not None else []
+    try:
+        lm = _load_latest()
+    except Exception:
+        return []
+    return get_recent_movies(lm, min_ratings=50, top_n=15) if lm is not None else []
 
 # 电影类型中文映射
 GENRE_CN = {
@@ -354,10 +360,15 @@ with tab5:
     st.subheader("最新热门电影")
     st.markdown("基于 MovieLens 最新数据集，无需 API Key，直连 GroupLens")
 
-    if latest_movies is None:
-        st.warning("最新电影数据集加载失败，请检查网络连接")
+    try:
+        lm = _load_latest()
+    except Exception:
+        lm = None
+
+    if lm is None:
+        st.info("最新电影数据集需从国外服务器下载，当前网络不可用。其他功能（个性化推荐、热门榜单、搜索、数据分析）不受影响。")
     else:
-        st.metric("数据集电影总数", f"{len(latest_movies):,}")
+        st.metric("数据集电影总数", f"{len(lm):,}")
 
         col_hot, col_recent = st.columns(2)
 

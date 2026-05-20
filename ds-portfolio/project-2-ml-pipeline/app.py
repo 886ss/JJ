@@ -137,7 +137,19 @@ with col_input:
                 except Exception as e:
                     st.error(f"获取失败: {e}")
         else:
-            st.warning("请在侧边栏「实时新闻配置」中输入 NewsAPI Key（免费注册: newsapi.org）")
+            # 无 API Key 时用预设示例模拟实时新闻体验
+            demo_articles = [
+                {"title": "NASA's James Webb Telescope discovers Earth-like exoplanet in habitable zone", "description": "Scientists announced the groundbreaking discovery of a new planet that could potentially support life."},
+                {"title": "Stock market hits all-time high as tech earnings exceed expectations", "description": "Major indices surged today following strong quarterly reports from leading technology companies."},
+                {"title": "World Cup final ends in dramatic penalty shootout victory", "description": "The championship match went into extra time before being decided by penalties."},
+                {"title": "Supreme Court to hear landmark case on digital privacy rights", "description": "The case could set significant legal precedent for how technology companies handle user data."},
+                {"title": "Breakthrough in quantum computing could revolutionize drug discovery", "description": "Researchers demonstrated a new quantum processor capable of solving complex molecular simulations."},
+                {"title": "Major League Baseball season preview: Top teams and players to watch", "description": "Opening day is just around the corner as teams finalize their rosters."},
+                {"title": "Philosophers debate ethics of artificial intelligence at global summit", "description": "Leading thinkers gathered to discuss the moral implications of advanced AI systems."},
+                {"title": "New GPU architecture promises 2x performance for deep learning workloads", "description": "The latest hardware generation targets AI training and inference acceleration."},
+            ]
+            st.session_state.live_news = demo_articles
+            st.success(f"已加载 {len(demo_articles)} 条示例新闻（配置 NewsAPI Key 可获取真实实时新闻）")
 
     # 展示实时新闻分类结果
     if "live_news" in st.session_state and st.session_state.live_news:

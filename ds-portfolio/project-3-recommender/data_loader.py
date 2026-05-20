@@ -48,15 +48,95 @@ def download_movielens(size: str = "100k") -> str:
     return extract_path
 
 
+def _generate_demo_data(n_users=100, n_items=200, n_ratings=5000, seed=42) -> dict:
+    """生成演示用模拟电影评分数据。下载失败时兜底。"""
+    rng = np.random.default_rng(seed)
+    movie_titles = [
+        "The Matrix", "Inception", "Interstellar", "The Dark Knight", "Pulp Fiction",
+        "Fight Club", "Forrest Gump", "The Shawshank Redemption", "The Godfather",
+        "Schindler's List", "Goodfellas", "The Silence of the Lambs", "Star Wars",
+        "Jurassic Park", "Toy Story", "Finding Nemo", "The Lion King", "Frozen",
+        "The Avengers", "Iron Man", "Spider-Man", "Black Panther", "Avatar",
+        "Titanic", "Gladiator", "Braveheart", "The Lord of the Rings", "Harry Potter",
+        "The Social Network", "Whiplash", "La La Land", "Parasite", "Joker",
+        "The Grand Budapest Hotel", "Mad Max: Fury Road", "Blade Runner 2049",
+        "Dune", "Everything Everywhere All at Once", "Oppenheimer", "Barbie",
+    ] * 5  # Repeat to reach 200
+    genre_names = ["Action", "Adventure", "Animation", "Comedy", "Crime", "Drama",
+                   "Fantasy", "Horror", "Romance", "Sci-Fi", "Thriller", "War"]
+    movies_data = []
+    for i in range(n_items):
+        year = rng.integers(1970, 2025)
+        n_genres = rng.integers(1, 4)
+        genres = list(rng.choice(genre_names, n_genres, replace=False))
+        movies_data.append({
+            "item_id": i + 1,
+            "title": movie_titles[i],
+            "year": year,
+            "clean_title": movie_titles[i],
+            "genres": genres,
+            **{g: 1 if g in genres else 0 for g in genre_names},
+        })
+
+    movies = pd.DataFrame(movies_data)
+    missing_cols = [c for c in ["release_date", "video_release_date", "IMDb_URL"] if c not in movies.columns]
+    for c in missing_cols:
+        movies[c] = ""
+
+    ratings_data = []
+    for _ in range(n_ratings):
+        ratings_data.append({
+            "user_id": int(rng.integers(1, n_users + 1)),
+            "item_id": int(rng.integers(1, n_items + 1)),
+            "rating": int(rng.integers(1, 6)),
+            "timestamp": int(rng.integers(800_000_000, 900_000_000)),
+        })
+    ratings = pd.DataFrame(ratings_data).drop_duplicates(subset=["user_id", "item_id"])
+    ratings["user_idx"] = ratings["user_id"] - 1
+    ratings["item_idx"] = ratings["item_id"] - 1
+
+    users = pd.DataFrame({
+        "user_id": range(1, n_users + 1),
+        "age": rng.integers(18, 65, n_users),
+        "gender": rng.choice(["M", "F"], n_users),
+        "occupation": "other",
+        "zip_code": "00000",
+    })
+
+    interactions = coo_matrix(
+        (ratings["rating"].values, (ratings["user_idx"].values, ratings["item_idx"].values)),
+        shape=(n_users, n_items),
+    ).tocsr()
+
+    genre_cols = genre_names
+    genre_matrix = movies[genre_cols].values.astype(np.float32)
+    item_features = csr_matrix(genre_matrix)
+
+    print(f"\n[数据] 演示数据已生成 (网络下载失败，使用模拟数据)")
+    print(f"  - 用户数: {n_users} | 电影数: {n_items} | 评分数: {len(ratings)}")
+    return {
+        "ratings": ratings, "movies": movies, "users": users,
+        "interactions": interactions, "n_users": n_users, "n_items": n_items,
+        "item_features": item_features,
+    }
+
+
 def load_movielens_100k(data_dir: str = None) -> dict:
-    """加载 MovieLens 100k 数据集"""
+    """加载 MovieLens 100k 数据集，下载失败自动回退演示数据。"""
     if data_dir is None:
         data_dir = os.path.join(DATA_DIR, "ml-100k")
 
     ratings_path = os.path.join(data_dir, "u.data")
     if not os.path.exists(ratings_path):
-        data_dir = download_movielens("100k")
-        ratings_path = os.path.join(data_dir, "u.data")
+        try:
+            data_dir = download_movielens("100k")
+            ratings_path = os.path.join(data_dir, "u.data")
+        except Exception as e:
+            print(f"[提示] MovieLens 下载失败 ({e})，使用演示数据")
+            return _generate_demo_data()
+
+    if not os.path.exists(ratings_path):
+        return _generate_demo_data()
 
     ratings_cols = ["user_id", "item_id", "rating", "timestamp"]
     ratings = pd.read_csv(ratings_path, sep="\t", names=ratings_cols)
@@ -144,14 +224,13 @@ def load_latest_movies() -> pd.DataFrame:
     """
     import zipfile, io
 
-    # 优先尝试 ml-latest（到 2023 年），失败回退 ml-latest-small
+    latest_dir = None
     for version in [("ml-latest", MOVIELENS_LATEST_URL, "2023"),
                     ("ml-latest-small", MOVIELENS_LATEST_SMALL_URL, "2018")]:
-        latest_dir = os.path.join(DATA_DIR, version[0])
-        if os.path.exists(latest_dir):
+        candidate_dir = os.path.join(DATA_DIR, version[0])
+        if os.path.exists(candidate_dir):
+            latest_dir = candidate_dir
             print(f"[OK] 数据集已存在: {latest_dir}（年份到 {version[2]}）")
-            movies_path = os.path.join(latest_dir, "movies.csv")
-            ratings_path = os.path.join(latest_dir, "ratings.csv")
             break
         try:
             print(f"[下载] 正在下载 MovieLens {version[0]}...")
@@ -161,13 +240,15 @@ def load_latest_movies() -> pd.DataFrame:
             print("[解压] 正在解压...")
             with zipfile.ZipFile(zip_path, "r") as zf:
                 zf.extractall(DATA_DIR)
+            latest_dir = candidate_dir
             print(f"[OK] 解压完成: {latest_dir}（年份到 {version[2]}）")
-            movies_path = os.path.join(latest_dir, "movies.csv")
-            ratings_path = os.path.join(latest_dir, "ratings.csv")
             break
         except Exception as e:
             print(f"[提示] {version[0]} 下载失败 ({e})，尝试下一个...")
             continue
+
+    if latest_dir is None:
+        raise RuntimeError("所有 MovieLens 下载源均不可用（网络受限），跳过最新电影数据")
 
     movies_path = os.path.join(latest_dir, "movies.csv")
     ratings_path = os.path.join(latest_dir, "ratings.csv")
