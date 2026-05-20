@@ -1,56 +1,37 @@
+# 环境变量
+.env
+
 # Python
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
-*.egg-info/
-dist/
-build/
-*.egg
-
-# Virtual environments
-venv/
 .venv/
-env/
+venv/
+
+# RAG 索引（自动生成，不入库）
+knowledge/indexes/
 
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb
-
-# Environment & secrets
-.env
-.env.local
-*.key
-*.pem
 
 # OS
 .DS_Store
 Thumbs.db
 
+# 开发工具
+.claude/
+.playwright-mcp/
+
+# 项目
+*.log
+.pytest_cache/
+
 # MLflow
 mlruns/
-*.db
 
-# Model files (>50MB)
-*.pkl
-*.joblib
-*.h5
-*.pb
-*.onnx
-
-# Data files (>50MB)
+# Data >50MB
 *.zip
 *.csv.gz
 *.parquet
 data/
-
-# Streamlit
-.streamlit/secrets.toml
-
-# Playwright
-.playwright-mcp/
