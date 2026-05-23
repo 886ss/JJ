@@ -23,6 +23,14 @@ Thumbs.db
 .claude/
 .playwright-mcp/
 
+# 个人文件（仅本地使用，不入库）
+p1-sidebar.png
+项目.md
+task_plan.md
+findings.md
+progress.md
+ds-portfolio/Claude Code 开发工作流（六步法）.md
+
 # 项目
 *.log
 .pytest_cache/
