@@ -1,253 +1,251 @@
-# DS-Portfolio: Data Science Practicum
+# DS-Portfolio：数据科学实践项目集
 
-## Project Overview
+## 项目简介
 
-This portfolio demonstrates the end-to-end data science workflow through three progressively deeper projects — from exploratory analysis to machine learning engineering to recommendation systems. Each project addresses a concrete business problem and delivers measurable results.
+本作品集通过三个递进式项目，完整展示数据科学工作流 —— 从探索性分析到机器学习工程，再到推荐系统。每个项目围绕一个具体业务问题展开，并以可量化的结果交付。
 
-The projects are designed to answer three questions that mirror real-world data science responsibilities:
+三个项目分别回答数据科学岗位最核心的三个问题：
 
-- **Can we turn raw transaction data into actionable business insights?** (Project 1)
-- **Can we build, evaluate, and deploy a reliable text classification system?** (Project 2)
-- **Can we deliver personalized recommendations at scale with measurable quality?** (Project 3)
+- **能否从原始交易数据中提炼可落地的业务洞察？**（项目一）
+- **能否构建、评估并部署一个可靠的文本分类系统？**（项目二）
+- **能否以可衡量的质量指标，为用户提供个性化推荐？**（项目三）
 
-All three projects include automated tests (28 test cases), RESTful API serving, interactive dashboards, and experiment tracking — reflecting engineering practices expected in a production team.
-
----
-
-## Objectives
-
-- **User behavior analysis** — Understand purchase patterns, time-based trends, and customer preferences from transaction logs
-- **Customer value segmentation** — Quantify customer lifetime value using RFM modeling to distinguish high-value from at-risk users
-- **Text classification automation** — Build a pipeline that classifies unstructured text into predefined categories with measurable accuracy
-- **Personalized recommendation** — Implement collaborative filtering to surface relevant items for each user, with cold-start fallbacks
-- **Reproducible experimentation** — Track every model run, parameter set, and evaluation metric for audit and comparison
-- **Deployable artifacts** — Package models as REST APIs and interactive dashboards, not just notebooks
+全部项目包含自动化测试（28 条用例）、RESTful API 服务、交互式 Dashboard 和实验追踪，对标工程团队的实际交付标准。
 
 ---
 
-## Tech Stack
+## 项目目标
 
-| Category | Tools |
+- **用户行为分析** — 从交易日志中理解购买模式、时间趋势与用户偏好
+- **客户价值分层** — 基于 RFM 模型量化客户生命周期价值，区分高价值用户与流失风险用户
+- **文本分类自动化** — 构建将非结构化文本归入预定义类别的 Pipeline，并给出可衡量的准确率
+- **个性化推荐** — 实现协同过滤，为每个用户推荐相关物品，并提供冷启动兜底方案
+- **可复现实验** — 追踪每一次模型运行、每一组参数和每一项评估指标，便于审计与对比
+- **可交付制品** — 以 REST API 和交互式 Dashboard 形式交付模型，而非停留在 Notebook 阶段
+
+---
+
+## 技术栈
+
+| 类别 | 工具 |
 | --- | --- |
-| Data Processing | Python, Pandas, NumPy, SciPy |
-| Machine Learning | scikit-learn, XGBoost, implicit |
-| Feature Engineering | TF-IDF, TruncatedSVD, sentence-transformers |
-| Experiment Tracking | MLflow |
-| Visualization | Plotly, Matplotlib, Seaborn |
-| Web Framework | Streamlit, FastAPI, uvicorn |
-| Containerization | Docker |
-| RAG / LLM | LlamaIndex, Chroma, DeepSeek API |
-| Testing | pytest (28 test cases) |
+| 数据处理 | Python、Pandas、NumPy、SciPy |
+| 机器学习 | scikit-learn、XGBoost、implicit |
+| 特征工程 | TF-IDF、TruncatedSVD、sentence-transformers |
+| 实验追踪 | MLflow |
+| 可视化 | Plotly、Matplotlib、Seaborn |
+| Web 框架 | Streamlit、FastAPI、uvicorn |
+| 容器化 | Docker |
+| RAG / LLM | LlamaIndex、Chroma、DeepSeek API |
+| 测试 | pytest（28 条用例） |
 
 ---
 
-## Project Workflow
+## 项目流程
 
 ```text
                     ┌──────────────────────────┐
-                    │     Data Ingestion        │
-                    │  (CSV / API / Download)   │
+                    │       数据输入             │
+                    │   (CSV / API / 下载)       │
                     └────────────┬─────────────┘
                                  ↓
                     ┌──────────────────────────┐
-                    │    Data Validation        │
-                    │  (Missing / Distribution  │
-                    │   / Outlier Detection)    │
+                    │       数据验证             │
+                    │   (缺失值 / 分布 / 异常)    │
                     └────────────┬─────────────┘
                                  ↓
                     ┌──────────────────────────┐
-                    │  Exploratory Analysis     │
-                    │  (Trends / Distributions  │
-                    │   / Correlations)         │
+                    │       探索性分析           │
+                    │   (趋势 / 分布 / 相关性)    │
                     └────────────┬─────────────┘
                                  ↓
                     ┌──────────────────────────┐
-                    │   Feature Engineering     │
-                    │  (TF-IDF / SVD / Implicit │
-                    │   Feedback Encoding)      │
+                    │       特征工程             │
+                    │   (TF-IDF / SVD /         │
+                    │    隐式反馈编码)           │
                     └────────────┬─────────────┘
                                  ↓
                ┌─────────────────┴─────────────────┐
                ↓                                   ↓
     ┌──────────────────┐                ┌──────────────────┐
-    │  Model Training   │                │  RFM / Segment   │
-    │  + Hyperparam     │                │  Analysis        │
-    │  Tuning + MLflow  │                │                  │
+    │    模型训练        │                │   RFM / 分层分析  │
+    │   + 超参调优       │                │                  │
+    │   + MLflow        │                │                  │
     └────────┬──────────┘                └────────┬─────────┘
              ↓                                    ↓
     ┌──────────────────┐                ┌──────────────────┐
-    │  Evaluation      │                │  KPI Calculation  │
-    │  (CV / P@K / AUC)│                │                  │
+    │     模型评估       │                │    KPI 计算       │
+    │  (CV/P@K/AUC)    │                │                  │
     └────────┬──────────┘                └────────┬─────────┘
              ↓                                    ↓
              └─────────────────┬──────────────────┘
                                ↓
                   ┌──────────────────────────┐
-                  │   Deployment              │
-                  │  (FastAPI / Streamlit /   │
-                  │   Docker)                 │
+                  │       部署交付             │
+                  │   (FastAPI / Streamlit /  │
+                  │    Docker)                │
                   └──────────────────────────┘
 ```
 
 ---
 
-## Core Features
+## 核心功能
 
-### Project 1 — E-Commerce Analytics Dashboard
+### 项目一：电商数据分析 Dashboard
 
-**Business problem:** An e-commerce operator needs to understand sales performance, product mix, and customer quality at a glance — without running SQL queries or exporting to Excel.
+**业务问题：** 电商运营人员需要快速了解销售表现、品类结构和客户质量，而不是每次打开 SQL 客户端或导出 Excel。
 
-- **5 real-time KPI cards** — Total revenue, order count, unique customers, average order value, refund rate. All respond to sidebar filters (date range, category, payment method).
-- **8 interactive Plotly visualizations** — Daily trend (dual-axis), category ranking, payment distribution, review histogram, geographic breakdown, weekday-hour heatmap, monthly growth rate, RFM segment composition.
-- **RFM customer segmentation** — Recency / Frequency / Monetary quartile scoring assigns every customer to one of 4 tiers (high-value, loyal, at-risk, lost). Displayed as an interactive donut chart with drill-down pivots.
-- **Cross-tabulation explorer** — Dynamically pivot any two dimensions (category × payment, state × segment) for ad-hoc analysis.
+- **5 个动态 KPI 指标卡** — 总销售额、订单数、客户数、客单价、退单率。全部响应侧边栏筛选条件（日期范围、品类、支付方式）。
+- **8 个交互式 Plotly 图表** — 日销售双轴趋势图、品类排名柱状图、支付方式环形图、评分分布直方图、地区分布图、星期×时段热力图、月度环比增长图、RFM 分层构成图。
+- **RFM 客户分层** — 基于 Recency / Frequency / Monetary 四分位评分，将客户划分为 4 个层级（高价值、忠诚、濒临流失、已流失）。以交互式环形图展示，支持交叉透视下钻。
+- **交叉透视表** — 动态组合任意两个维度（品类×支付方式、地区×客户层级），满足临时分析需求。
 
-### Project 2 — Text Classification ML Pipeline
+### 项目二：文本分类 ML Pipeline
 
-**Business problem:** Manually categorizing thousands of incoming documents (news articles, support tickets, etc.) is slow and inconsistent. The goal is an automated classifier with known accuracy that can be deployed behind an API.
+**业务问题：** 人工分类大量文档（新闻、客服工单等）效率低且标准不一致。目标是构建一个准确率可衡量、可部署为 API 的自动分类器。
 
-- **End-to-end training pipeline** — `config → data → features → train → tune → evaluate → serve`. Each stage is a standalone module with a clear interface.
-- **Multi-model comparison** — Logistic Regression (baseline), Linear SVM, Random Forest, XGBoost trained under identical conditions. 5-fold stratified cross-validation ensures reliable performance estimates.
-- **Feature extraction with dimensionality reduction** — TF-IDF (5000 features, n-gram 1–2) + TruncatedSVD (100 components) + StandardScaler. The extractor is serialized alongside the model for guaranteed consistency between training and inference.
-- **MLflow experiment tracking** — Parameters, metrics, and artifacts logged for every run. Enables reproducibility and experiment comparison across model types.
-- **Three serving interfaces** — CLI tool (`predict.py`) for batch prediction, FastAPI (`serve.py`) with Swagger docs, and Streamlit UI (`app.py`) with real-time news fetching for demo.
-- **Docker deployment** — Single-container deployment with model pre-trained at build time.
+- **端到端训练流水线** — `配置 → 数据 → 特征 → 训练 → 调优 → 评估 → 部署`。每个阶段为独立模块，接口清晰。
+- **多模型对比** — Logistic Regression（基线）、Linear SVM、Random Forest、XGBoost 在相同条件下训练。5 折分层交叉验证保证评估可信度。
+- **特征提取与降维** — TF-IDF（5000 特征，1-2 n-gram）+ TruncatedSVD（100 维）+ StandardScaler。特征提取器与模型一同序列化，确保训练和推理的特征空间一致。
+- **MLflow 实验追踪** — 每次运行的参数、指标、产物写入 MLflow，支持跨模型复现与对比。
+- **三种服务入口** — CLI 命令行工具（`predict.py`）、FastAPI 服务（`serve.py`，含 Swagger 文档）、Streamlit 交互界面（`app.py`，支持实时新闻抓取演示）。
+- **Docker 一键部署** — 构建时自动训练模型，单容器运行 FastAPI 服务。
 
-### Project 3 — Movie Recommendation Engine
+### 项目三：电影推荐引擎
 
-**Business problem:** In content platforms, 80% of consumption comes from recommendations. A quality recommender directly drives engagement and retention. This project builds one from scratch and measures its quality.
+**业务问题：** 内容平台 80% 的消费来自推荐。高质量的推荐系统直接驱动用户活跃度和留存率。本项目从零构建并量化评估推荐质量。
 
-- **Three collaborative filtering algorithms** — ALS (Alternating Least Squares), BPR (Bayesian Personalized Ranking), LMF (Logistic Matrix Factorization) implemented via the `implicit` library. Each is trained on implicit feedback (rating ≥ 4 → positive).
-- **Hybrid recommendation** — Collaborative filtering signals are combined with content-based features (18-dim movie genre vectors) via weighted scoring, providing reasonable recommendations for items with sparse interaction history.
-- **Multi-endpoint REST API** — `/recommend/{user_id}` (personalized), `/recommend/{user_id}/hybrid` (CF + content), `/popular` (global hot list), `/search?q=` (keyword), `/similar/{item_id}` (content-based similarity).
-- **Interactive exploration UI** — 5-tab Streamlit app covering personalized recommendations, popularity leaderboard, movie search, data analytics, and trending recent movies (lazy-loaded from GroupLens latest dataset).
+- **三种协同过滤算法** — ALS（交替最小二乘）、BPR（贝叶斯个性化排序）、LMF（逻辑矩阵分解），基于 `implicit` 库实现。统一以隐式反馈训练（评分 ≥ 4 → 正反馈）。
+- **混合推荐** — 协同过滤信号与内容特征（18 维电影类型向量）加权融合，为交互稀疏的物品提供合理推荐，缓解冷启动问题。
+- **多端点 REST API** — `/recommend/{user_id}`（个性化推荐）、`/recommend/{user_id}/hybrid`（CF+内容混合）、`/popular`（热门榜单）、`/search?q=`（关键词搜索）、`/similar/{item_id}`（内容相似推荐）。
+- **交互式探索界面** — 5 标签页 Streamlit 应用：个性化推荐、热门榜单、电影搜索、数据分析、最新热门电影（从 GroupLens 实时懒加载，含热门综合榜 vs 近年高分榜对比）。
 
-### RAG Knowledge Base
+### RAG 知识库
 
-- Codebase-aware Q&A system built with LlamaIndex + Chroma vector store + DeepSeek LLM.
-- Ingests all project source files (`.py`, `.md`, `.json`, `.yml`) for documentation-free project understanding.
-- Chunk size 1024 tokens, overlap 128; embeddings via `BAAI/bge-small-zh-v1.5`.
+- 基于 LlamaIndex + Chroma 向量存储 + DeepSeek LLM 构建的代码库问答系统。
+- 自动索引全部项目源文件（`.py`、`.md`、`.json`、`.yml`），无需额外文档即可自然语言查询。
+- 分块 1024 tokens，重叠 128；嵌入模型使用 `BAAI/bge-small-zh-v1.5`。
 
 ---
 
-## Results
+## 项目结果
 
-| Metric | Value |
+| 指标 | 数值 |
 | --- | --- |
-| E-commerce orders processed | 12,000 |
-| Customer segments identified (RFM) | 4 tiers |
-| Dashboard interactive components | 8 charts + 5 KPIs |
-| Text classification articles | 17,886 (6 categories) |
-| Best classifier test F1 (Logistic Regression) | 0.812 |
-| CV F1 (5-fold) | 0.806 ± 0.010 |
-| Models compared (ML pipeline) | 4 (LR / SVM / RF / XGBoost) |
-| MLflow tracked experiments | 4 full-pipeline runs |
-| Recommendation ratings processed | 100,000 |
-| Users × Items (MovieLens 100k) | 943 × 1,682 |
-| Interaction matrix sparsity | 93.7% |
-| Best recommender Precision@10 | 0.16 |
-| Best recommender Recall@10 | 0.19 |
-| Best recommender AUC | 0.79 |
-| Recommendation algorithms compared | 3 (ALS / BPR / LMF) |
-| API endpoints (total across projects) | 10+ |
-| Automated tests | 28 (all passing) |
+| 处理电商订单数 | 12,000 |
+| RFM 客户分层 | 4 个层级 |
+| Dashboard 交互组件 | 8 图表 + 5 KPI |
+| 文本分类文章数 | 17,886（6 类） |
+| 最佳分类器测试 F1（逻辑回归） | 0.812 |
+| 5 折交叉验证 F1 | 0.806 ± 0.010 |
+| 对比模型数（ML Pipeline） | 4（LR / SVM / RF / XGBoost） |
+| MLflow 追踪实验 | 4 次全流程运行 |
+| 推荐系统评分数据量 | 100,000 条 |
+| 用户数 × 电影数（MovieLens 100k） | 943 × 1,682 |
+| 交互矩阵稀疏度 | 93.7% |
+| 最佳推荐 Precision@10 | 0.16 |
+| 最佳推荐 Recall@10 | 0.19 |
+| 最佳推荐 AUC | 0.79 |
+| 对比推荐算法数 | 3（ALS / BPR / LMF） |
+| API 端点总数（跨项目） | 10+ |
+| 自动化测试 | 28 条（全部通过） |
 
 ---
 
-## Challenges & Solutions
+## 难点与解决方案
 
-### 1. Synthetic Data Distribution Bias
+### 1. 模拟数据分布偏差
 
-**Problem:** The initial date generation used `np.random.exponential`, causing January to receive 3,518 orders while December received only 279 (30:1 ratio). Monthly revenue growth rate was artificially inflated to 138%. Order timestamps lacked hour components, rendering the weekday-hour heatmap useless.
+**问题：** 日期生成使用 `np.random.exponential` 导致 1 月 3,518 单 vs 12 月仅 279 单（30:1 极差）。月度环比增长率虚高至 138%。订单时间戳缺少小时分量，星期×时段热力图退化为柱状图。
 
-**Solution:** Replaced exponential sampling with uniform distribution. Added randomized hour components to timestamps. Post-fix: monthly order max/min ratio dropped to 1.14 (std=38), revenue MoM stabilized at ~1.2%, and heatmaps showed meaningful 24-hour patterns.
+**解决：** 改用均匀分布生成日期，添加随机小时分量。修复后月订单极差降至 1.14（标准差 38），月度环比稳定在 ~1.2%，热力图恢复 24 小时模式。
 
-### 2. Recommendation Evaluation Bug
+### 2. 推荐评估 Bug
 
-**Problem:** `filter_already_liked_items` was set to `False` in the recommendation generation step. Items the user had already interacted with (training data) dominated the top-K ranking, crowding out test-set items. Precision@10 was deflated to 0.016 — a 10× underestimation of true model quality.
+**问题：** 推荐生成时 `filter_already_liked_items` 设为 `False`，用户已交互物品占据 Top-K 排名，挤占了测试集物品位置。Precision@10 被压至 0.016 —— 真实模型质量被低估 10 倍。
 
-**Solution:** Enabled `filter_already_liked_items=True`. Precision@10 corrected from 0.016 → 0.16, Recall@10 from 0.044 → 0.19. The fix was verified by re-running evaluation and confirming that recommended items were disjoint from the user's training interactions.
+**解决：** 启用 `filter_already_liked_items=True`。Precision@10 从 0.016 修正为 0.16，Recall@10 从 0.044 修正为 0.19。通过验证推荐列表与训练交互不重叠，确认修复有效。
 
-### 3. SVD Dimensionality Trade-off
+### 3. SVD 降维取舍
 
-**Problem:** TruncatedSVD with 100 components retained only 14.27% of TF-IDF variance. Increasing components would improve fidelity but also increase model size and inference latency — relevant for deployment behind an API.
+**问题：** TruncatedSVD 100 维仅保留 14.27% TF-IDF 方差。增加维度可提升保真度，但会增加模型大小与推理延迟——对 API 部署场景有实际影响。
 
-**Solution:** Accepted the 100-dim trade-off given the deployment context. The Logistic Regression model with 100-dim SVD still achieved 81.2% test F1 — adequate for a 6-class text classifier. The design decision was documented so a future maintainer can increase dimensionality if higher accuracy is needed.
+**解决：** 在部署约束下接受 100 维取舍。100 维 SVD + 逻辑回归仍达 81.2% 测试 F1，对 6 分类文本任务足够。此设计决策已文档化，后续可按需增加维度。
 
-### 4. Label-Configuration Drift
+### 4. 标签与配置不一致
 
-**Problem:** The config file claimed "4 categories," while the actual category mapping defined 6 (including a catch-all "其他" class for `misc.forsale`). The README stated 5. This inconsistency would confuse anyone inheriting the project.
+**问题：** 配置文件注释写"4 大类"，实际类别映射定义了 6 类（含 `misc.forsale` 聚合的"其他"类），README 声称 5 类。接手项目的人会困惑。
 
-**Solution:** Corrected config comments and README to consistently document 6 categories. The "其他" class (933 samples, 5.2% of data) was left as-is since it represents a legitimate catch-all category for out-of-domain text.
-
----
-
-## Highlights
-
-- **Multi-project narrative arc** — Analysis → Modeling → Recommendation. Each project builds on skills from the previous one, forming a coherent story for interviews.
-- **Engineering, not notebooks** — Modular Python packages with separated concerns, CLI entry points, and automated tests. Every model is deployable behind an API.
-- **Experiment reproducibility** — MLflow tracks parameters, metrics, and artifacts. Model + feature extractor are serialized together so inference output matches training-time expectations.
-- **Bug discovery and fix documentation** — Data distribution bias, evaluation metric deflation, and label-config mismatch were systematically identified through a structured DS review process and fixed with verified results.
-- **RAG-powered project understanding** — The codebase itself is indexed into a Chroma vector store, enabling natural-language queries about implementation details.
-- **Production-adjacent practices** — Docker containerization, Pydantic request validation, global error handling in FastAPI, Streamlit theme customization per project.
+**解决：** 统一修正配置注释、README 中所有类别描述为 6 类。"其他"类（933 样本，占比 5.2%）保留，因为它代表合理的领域外兜底类别。
 
 ---
 
-## Repository Structure
+## 项目亮点
+
+- **递进式叙事线** — 分析 → 建模 → 推荐。每个项目以前一个项目的技能为基础，构成面试时可自然讲述的完整故事。
+- **工程化交付，而非 Notebook** — 模块化 Python 包，职责分离，CLI 入口，自动化测试。每个模型都可部署为 API。
+- **实验可复现** — MLflow 追踪参数、指标、产物。模型与特征提取器一同序列化，推理输出与训练时保持一致。
+- **Bug 发现与修复文档化** — 数据分布偏差、评估指标失真、标签配置不一致，均通过结构化 DS 审查流程系统识别并修复，附验证结果。
+- **RAG 驱动的项目理解** — 代码库索引进 Chroma 向量存储，支持自然语言查询实现细节。
+- **贴近生产实践** — Docker 容器化、Pydantic 请求校验、FastAPI 全局异常处理、Streamlit 分项目主题定制。
+
+---
+
+## 仓库结构
 
 ```text
 ds-portfolio/
-├── README.md                         # This file
+├── README.md                         # 本文件
 │
-├── project-1-dashboard/              # E-commerce Analytics
-│   ├── app.py                        # Streamlit dashboard
-│   ├── data_loader.py                # Data generation & RFM
-│   ├── visualizations.py             # 8 Plotly chart functions
-│   └── test_dashboard.py             # 12 tests
+├── project-1-dashboard/              # 电商数据分析
+│   ├── app.py                        # Streamlit 主应用
+│   ├── data_loader.py                # 数据生成与 RFM 分层
+│   ├── visualizations.py             # 8 个 Plotly 图表函数
+│   └── test_dashboard.py             # 12 条测试
 │
-├── project-2-ml-pipeline/            # Text Classification
-│   ├── config.py                     # Central configuration
-│   ├── data.py                       # Data loading & cleaning
-│   ├── features.py                   # TF-IDF + SVD extractors
-│   ├── embedding.py                  # Sentence-transformer alternative
-│   ├── train.py                      # Training with MLflow
-│   ├── tune.py                       # GridSearchCV hyperparameter search
-│   ├── evaluate.py                   # Evaluation & metrics
-│   ├── predict.py                    # CLI inference
-│   ├── serve.py                      # FastAPI server
-│   ├── app.py                        # Streamlit UI
-│   ├── Dockerfile                    # Container deployment
-│   └── test_pipeline.py              # 11 tests
+├── project-2-ml-pipeline/            # 文本分类
+│   ├── config.py                     # 全局配置
+│   ├── data.py                       # 数据加载与清洗
+│   ├── features.py                   # TF-IDF + SVD 特征提取
+│   ├── embedding.py                  # Sentence-transformer 备选方案
+│   ├── train.py                      # 训练 + MLflow
+│   ├── tune.py                       # GridSearchCV 超参搜索
+│   ├── evaluate.py                   # 评估与指标
+│   ├── predict.py                    # CLI 推理
+│   ├── serve.py                      # FastAPI 服务
+│   ├── app.py                        # Streamlit 界面
+│   ├── Dockerfile                    # 容器化部署
+│   └── test_pipeline.py              # 11 条测试
 │
-├── project-3-recommender/            # Movie Recommendations
-│   ├── data_loader.py                # MovieLens ingestion
-│   ├── train.py                      # ALS / BPR / LMF training
-│   ├── evaluate.py                   # Evaluation & comparison
-│   ├── serve.py                      # FastAPI recommendation API
-│   ├── app.py                        # Streamlit UI
-│   └── test_recommender.py           # 6 tests
+├── project-3-recommender/            # 电影推荐
+│   ├── data_loader.py                # MovieLens 数据加载
+│   ├── train.py                      # ALS / BPR / LMF 训练
+│   ├── evaluate.py                   # 评估与对比实验
+│   ├── serve.py                      # FastAPI 推荐 API
+│   ├── app.py                        # Streamlit 界面
+│   └── test_recommender.py           # 6 条测试
 │
-└── rag/                              # RAG Knowledge Base
-    ├── loader.py                     # Document ingestion
-    ├── index_builder.py              # Chroma vector indexing
-    ├── query_engine.py               # LLM-powered Q&A
-    └── config.py                     # API & embedding config
+└── rag/                              # RAG 知识库
+    ├── loader.py                     # 文档加载
+    ├── index_builder.py              # Chroma 向量索引
+    ├── query_engine.py               # LLM 问答引擎
+    └── config.py                     # API 与嵌入配置
 ```
 
 ---
 
-## Quick Start
+## 快速开始
 
 ```bash
-# Project 1 — Dashboard
+# 项目一：Dashboard
 cd project-1-dashboard && pip install -r requirements.txt && streamlit run app.py
 
-# Project 2 — ML Pipeline
+# 项目二：ML Pipeline
 cd project-2-ml-pipeline && pip install -r requirements.txt && python train.py
 
-# Project 3 — Recommender
+# 项目三：推荐系统
 cd project-3-recommender && pip install -r requirements.txt && python train.py
 
-# Run all tests
+# 运行全部测试
 pytest ds-portfolio/ -v
 ```
